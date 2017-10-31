@@ -1,0 +1,10 @@
+extends layout
+
+block content
+
+	h3.
+		Tests
+	ul
+		each test, i in testlist
+			li#test_list_item
+				a(href='#') #{test.name}
