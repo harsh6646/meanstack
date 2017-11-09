@@ -9,7 +9,43 @@ mongoClient.connect(url, function (err, db) { // make connection
 	} else {
 		console.log("Connection established to: ", url);
 		// TODO build the tables/collections with validation/restiction	
-
+		db.createCollection("Story", {
+			validationLevel: "strict",
+			validationAction: "error",
+			validator: { $and: [
+				{
+					xAxis: {
+						$type: "int",
+						$exists: true,
+					}
+				},
+				{
+					yAxis: {
+						$type: "int",
+						$exists: true,
+					}
+				},
+				{
+					storyText: {
+						$type: "string",
+						$exists: true,
+					}
+				},
+				{
+					keywords: {
+						$type: "string",
+						$exists: true,
+					}
+				},
+				]
+			},
+		});
+		db.Story.insert({
+			xAxis: 0,
+			yAxis: 0,
+			storyText: "testing",
+			keywords: "test"
+		});
 		db.close();
 	}
 });
