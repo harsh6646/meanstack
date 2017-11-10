@@ -34,11 +34,23 @@ router.get('/test2', function (req, res) {
 router.get('/initdb', function (req, res) {
 	var mongoClient = mongodb.MongoClient;
 	var url = 'mongodb://localhost:27017/spiderWeb';
+	var guyExists = false;
 	mongoClient.connect(url, function (err, db) { // make connection
 		if(err) { // error check
 			console.log("unable to connect to database", err);
 		} else {
-			db.createCollection("Story", {
+			
+			db.collections(function (err,cols) {
+				console.log(cols.s.name);
+				for(var i = 0; i < cols.length; i++) {
+				var col = cols[i];
+				if(col.collectionName == "Story") {
+					guyExists = true;
+				}
+			}
+			});
+			if(!guyExists) {
+				db.createCollection("Story", {
 				validationLevel: "strict",
 				validationAction: "error",
 				validator: { $and: [
@@ -68,27 +80,17 @@ router.get('/initdb', function (req, res) {
 					},
 					]
 				},
-			});
-			var renderResult = "jeff";/// fucked uppppp its rendering jefffff 
-			db.listCollections({name: "Story"}) // need a better way of checking this collection exists
-			.next(function(err, collinfo) {
-	        	if (collinfo) {
-	            // The collection exists
-					renderResult = false;
-	        	} else {
-	        		var collection = db.collection("Story");
+				});
+				var collection = db.collection("Story");
 					collection.insert({
 					xAxis: 0,
 					yAxis: 0,
 					storyText: "testing",
 					keywords: "test"
 					});
-					renderResult = true;
-	        	}
-	    });
-			
+			}
 			db.close;
-			res.render("dbsetup", {col: renderResult});
+			res.render("dbsetup", {col: guyExists});
 		}	
 	});
 });
