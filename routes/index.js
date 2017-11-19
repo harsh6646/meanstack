@@ -34,64 +34,60 @@ router.get('/test2', function (req, res) {
 router.get('/initdb', function (req, res) {
 	var mongoClient = mongodb.MongoClient;
 	var url = 'mongodb://localhost:27017/spiderWeb';
-	var guyExists = false;
+	var sDrop = false;
 	mongoClient.connect(url, function (err, db) { // make connection
 		if(err) { // error check
 			console.log("unable to connect to database", err);
 		} else {
-			
-			db.collections(function (err,cols) {
-				console.log(cols.s.name);
-				for(var i = 0; i < cols.length; i++) {
-				var col = cols[i];
-				if(col.collectionName == "Story") {
-					guyExists = true;
+			db.dropCollection("Story", function (err, result) {
+				if(null == err) {
+					console.log("Story dropped");
+					sDrop = true;
+				} else {
+					console.log("Story drop failed");
 				}
-			}
 			});
-			if(!guyExists) {
-				db.createCollection("Story", {
-				validationLevel: "strict",
-				validationAction: "error",
-				validator: { $and: [
-					{
-						xAxis: {
-							$type: "int",
-							$exists: true,
-						}
-					},
-					{
-						yAxis: {
-							$type: "int",
-							$exists: true,
-						}
-					},
-					{
-						storyText: {
-							$type: "string",
-							$exists: true,
-						}
-					},
-					{
-						keywords: {
-							$type: "string",
-							$exists: true,
-						}
-					},
-					]
-				},
-				});
-				var collection = db.collection("Story");
-					collection.insert({
+			db.createCollection("Story", {
+				// validationLevel: "strict",
+				// validationAction: "error",
+				// validator: {
+					
+				// 		"xAxis": {
+				// 			$type: "int",
+				// 			$exists: true,
+				// 		}
+				// 	,
+					
+				// 		"yAxis": {
+				// 			$type: "int",
+				// 			$exists: true,
+				// 		}
+				// 	,
+					
+				// 		"storyText": {
+				// 			$type: "string",
+				// 			$exists: true,
+				// 		}
+				// 	,
+					
+				// 		"keywords": {
+				// 			$type: "string",
+				// 			$exists: true,
+				// 		}
+				// 	,
+				// }
+			}, function (err, col) {
+				col.insert({
 					xAxis: 0,
-					yAxis: 0,
-					storyText: "testing",
-					keywords: "test"
-					});
-			}
-			db.close;
-			res.render("dbsetup", {col: guyExists});
-		}	
+	 				yAxis: 0,
+	 				storyText: "testing",
+			 		keywords: "test"
+	 			}, {}, function () {
+	 				db.close();
+	 				res.render("dbsetup", {col: sDrop});
+	 			});
+			});
+		}
 	});
 });
 module.exports = router;
