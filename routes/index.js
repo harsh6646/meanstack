@@ -77,17 +77,39 @@ router.get('/initdb', function (req, res) {
 				// 	,
 				// }
 			}, function (err, col) {
-				col.insert({
+				col.insertOne({
 					xAxis: 0,
 	 				yAxis: 0,
 	 				storyText: "testing",
 			 		keywords: "test"
-	 			}, {}, function () {
+	 			}, {}, function (err, r) {
 	 				db.close();
 	 				res.render("dbsetup", {col: sDrop});
 	 			});
 			});
 		}
+	});
+});
+
+router.get("/insertOne", function (req, res) {
+	var mongoClient = mongodb.MongoClient;
+	var url = 'mongodb://localhost:27017/spiderWeb';
+	mongoClient.connect(url, function (err, db) {
+		var col = db.collection('Story');
+		col.insertOne({
+			xAxis: 2,
+	 		yAxis: 2,
+	 		storyText: "testing2",
+			keywords: "test2"
+	 		}, {}, function (err, r) {
+	 			var insert = false;
+	 			if(err == null) {
+	 				insert = true;
+	 			}
+	 			db.close();
+	 			res.render("insertOne", {col: insert});
+	 		}
+	 	);
 	});
 });
 module.exports = router;
