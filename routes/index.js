@@ -46,47 +46,35 @@ router.get('/initdb', function (req, res) {
 				} else {
 					console.log("Story drop failed");
 				}
-			});
-			db.createCollection("Story", {
-				// validationLevel: "strict",
-				// validationAction: "error",
-				// validator: {
-					
-				// 		"xAxis": {
-				// 			$type: "int",
-				// 			$exists: true,
-				// 		}
-				// 	,
-					
-				// 		"yAxis": {
-				// 			$type: "int",
-				// 			$exists: true,
-				// 		}
-				// 	,
-					
-				// 		"storyText": {
-				// 			$type: "string",
-				// 			$exists: true,
-				// 		}
-				// 	,
-					
-				// 		"keywords": {
-				// 			$type: "string",
-				// 			$exists: true,
-				// 		}
-				// 	,
-				// }
-			}, function (err, col) {
-				col.insertOne({
-					xAxis: 0,
-	 				yAxis: 0,
-	 				storyText: "testing",
-			 		keywords: "test"
-	 			}, {}, function (err, r) {
-	 				db.close();
-	 				res.render("dbsetup", {col: sDrop});
-	 			});
-			});
+				db.createCollection("Story", {
+				validationLevel: "strict",
+				validationAction: "error",
+				validator: {	
+				 	xAxis: {
+				 		$type: "number"
+				 	},	
+					yAxis: {
+						$type: "number"
+				 	},	
+					storyText: {
+						$type: "string"
+				 	},
+					keywords: {
+				 		$type: "string"
+				 	}
+				}
+				}, function (err, col) {
+					col.insertOne({
+						xAxis: 0,
+	 					yAxis: 0,
+	 					storyText: "testing",
+			 			keywords: "test"
+	 				}, {}, function (err, r) {
+	 					db.close();
+	 					res.render("dbsetup", {col: sDrop});
+	 				});
+				});
+			});	
 		}
 	});
 });
